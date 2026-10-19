@@ -11,19 +11,19 @@
 ##SBATCH --partition=TODO        # TODO(HPG): GPU partition name
 ##SBATCH --gpus=TODO:1           # TODO(HPG): L4 GPU type string
 #
-# Train notebooks/02_train.py as a batch job. Submit from the repo root; any
-# extra arguments go straight to the training script:
+# Train notebooks/03_train.py as a batch job. Submit from the repo root, after
+# notebooks/01_preprocess.py has written data/processed/mnist1d.npz.
+# Extra arguments go straight to the training script:
 #
-#   sbatch scripts/train.sbatch --epochs 30 --lr 0.003
+#   sbatch scripts/train.sbatch --epochs 5 --lr 0.01
 #
-# Metrics land in runs/<run name>/, and in MLflow too if a server from
-# scripts/mlflow_server.sbatch is running (found via mlruns/server.env).
+# Each run writes runs/<timestamp>-<jobid>/{params.json,metrics.csv,model.pt}.
 # Override the Python launcher with RUN, e.g. RUN=python if an env is active.
 set -euo pipefail
 
 cd "${SLURM_SUBMIT_DIR:-.}"
-if [[ ! -f notebooks/02_train.py ]]; then
-    echo "error: submit from the repo root (no notebooks/02_train.py in $PWD)" >&2
+if [[ ! -f notebooks/03_train.py ]]; then
+    echo "error: submit from the repo root (no notebooks/03_train.py in $PWD)" >&2
     exit 1
 fi
 
@@ -35,4 +35,9 @@ if command -v nvidia-smi > /dev/null; then
     nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
 fi
 
-"${run[@]}" notebooks/02_train.py -- "$@"
+# `uv run` stops parsing at `--` and forwards the rest. A plain python
+# launcher (RUN=python) must see the flags itself, so don't insert `--`.
+case $(basename "${run[0]}") in
+    uv | uvx) "${run[@]}" notebooks/03_train.py -- "$@" ;;
+    *) "${run[@]}" notebooks/03_train.py "$@" ;;
+esac
