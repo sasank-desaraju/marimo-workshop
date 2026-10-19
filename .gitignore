@@ -9,6 +9,7 @@ logs/*
 slurm-*.out
 
 # Python and tooling
+uv.lock
 __pycache__/
 *.py[cod]
 .venv/
