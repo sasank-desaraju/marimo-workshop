@@ -7,9 +7,9 @@
 # TODO(HPG): account/QOS, if your group needs them set explicitly.
 ##SBATCH --account=TODO
 ##SBATCH --qos=TODO
-# MNIST-1D trains fine on CPU. To run on an L4 anyway, uncomment and fill in:
-##SBATCH --partition=TODO        # TODO(HPG): GPU partition name
-##SBATCH --gpus=TODO:1           # TODO(HPG): L4 GPU type string
+# MNIST-1D trains fine on CPU. For an L4, uncomment the next line.
+# No partition directive: https://docs.rc.ufl.edu/scheduler/gpu_access/
+##SBATCH --gpus=1
 #
 # Train notebooks/03_train.py as a batch job. Submit from the repo root, after
 # notebooks/01_preprocess.py has written data/processed/mnist1d.npz.
@@ -27,7 +27,8 @@ if [[ ! -f notebooks/03_train.py ]]; then
     exit 1
 fi
 
-# TODO(HPG): load whatever provides uv (or python with torch), e.g. `module load ...`
+# uv comes with the conda module. https://docs.rc.ufl.edu/software/uv/
+module load conda
 read -ra run <<< "${RUN:-uv run}"
 
 echo "Job ${SLURM_JOB_ID:-none} (${SLURM_JOB_NAME:-local}) on $(hostname -s) at $(date '+%F %T')"

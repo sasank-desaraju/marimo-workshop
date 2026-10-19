@@ -13,15 +13,15 @@ second, so there is nothing to download, and it trains in seconds on a CPU.
 Training uses a GPU when the job has one. The data stays MNIST-1D either way.
 
 Only `notebooks/00_hello_hpg_mo.py` uses the `_mo.py` suffix. The JupyterLab
-marimo extension opens `*_mo.py` files in marimo on double-click. The pipeline
-notebooks are plain `.py` (open them with `uvx marimo edit` or the launcher's
-"Edit with marimo").
+marimo extension opens those files in marimo on double-click once JupyterLab
+is new enough (see the Jupyter route). The pipeline notebooks are plain `.py`
+(open them with `uvx marimo edit` or the launcher's "Edit with marimo").
 
 ## Agenda (HPG segment, ~20 minutes)
 
 | Time | Topic |
 |---|---|
-| 0:00 | Routes: OOD Marimo, JupyterLab opens `00_hello_hpg_mo.py`, Desktop + tunnel |
+| 0:00 | Routes: OOD Marimo, Jupyter Notebook, Desktop + tunnel |
 | 0:04 | Preprocess: `01_preprocess.py` in the editor, then the same file from the CLI |
 | 0:09 | Dataset: `02_dataset.py` visuals, then pytest (break the length assert live) |
 | 0:14 | `sbatch scripts/train.sbatch --epochs 5` and glance at the log |
@@ -37,9 +37,11 @@ git clone TODO_REPO_URL marimo-workshop
 cd marimo-workshop
 cp .env.example .env              # then paste your NaviGator key into .env
 
-# TODO(HPG): how to get uv (module name, or the standalone installer).
-module load TODO_UV_MODULE
-# Keep uv's package cache (PyTorch is several GB) off your home quota.
+# uv comes with the conda module. https://docs.rc.ufl.edu/software/uv/
+module load conda
+# PyTorch is several GB. RC suggests symlinking ~/.cache onto /blue:
+#   ln -s /blue/TODO_GROUP/$USER/.cache ~/.cache
+# UV_CACHE_DIR is the other way to keep that cache off the home quota.
 export UV_CACHE_DIR=/blue/TODO_GROUP/$USER/.cache/uv
 # TODO(HPG): PyPI torch wheels need a recent NVIDIA driver. Check that
 # torch.cuda.is_available() is True on an L4 node (if not, training uses CPU,
@@ -49,14 +51,17 @@ export UV_CACHE_DIR=/blue/TODO_GROUP/$USER/.cache/uv
 Each notebook declares its own dependencies in a PEP 723 header, so
 `uvx marimo edit --sandbox <file>` or `uv run <file>` builds the right
 environment on first use and reuses it after that. `03_train.py` is a plain
-script with the same kind of header.
+script with the same kind of header. HPG also has
+`module load marimo/0.25.2`, the same version as these notebooks.
+The commands below still go through uv.
 
 ## Routes
 
 ### 1. OOD Marimo app (just to show)
 
 1. Open OnDemand, start the **TODO(HPG): Marimo app name** app with the working
-   directory set to this repo (or a single file).
+   directory set to this repo (or a single file). On a compute node,
+   `module load marimo/0.25.2` is the cluster install.
 2. Open `notebooks/00_hello_hpg_mo.py`: move the sliders, then look at the host
    and Slurm job info.
 3. Open the AI chat side panel. It talks to NaviGator through the
@@ -65,19 +70,23 @@ script with the same kind of header.
    TODO(HPG): confirm the OOD app's marimo version understands `env:` keys and
    has `openai` installed; otherwise set the key in Settings → AI.
 
-### 2. OOD JupyterLab with the marimo plugin (just to show)
+### 2. OOD Jupyter Notebook (just to show)
 
-1. Start **TODO(HPG): JupyterLab app** and `cd` to this repo in the file browser.
-2. Double-click `notebooks/00_hello_hpg_mo.py`. The `_mo.py` suffix makes the
-   marimo extension open it in marimo. Other `.py` files open in the normal
-   editor; use the launcher or right-click **TODO(HPG): plugin menu** for those.
+1. Interactive Apps → Servers → **Jupyter Notebook**, then open this repo in
+   the file browser. https://docs.rc.ufl.edu/interfaces/jupyter_ood/
+2. Double-click `notebooks/00_hello_hpg_mo.py`. That `_mo.py` suffix is what
+   marimo-jupyter-extension 0.5.0 uses to open a file in marimo, and the
+   extension needs JupyterLab >= 4.5. HPG is on JupyterLab 3.6.6; an upgrade
+   is requested from RC, so the double-click does not open marimo yet. Other
+   `.py` files open in the normal editor.
 
 ### 3. OOD Desktop (main demo)
 
-Start the **TODO(HPG): Desktop app** with an L4 GPU and job name `marimo-ws`
-(TODO(HPG): which form field takes `--job-name=marimo-ws`, and the L4
-partition/GPU string). Open a terminal in the desktop, then, from the repo
-root:
+Start the **TODO(HPG): Desktop app** on an L4: partition `hpg-turin`, gres
+`gpu:1`. The `hwgui` partition also has L4s if the desktop needs hardware
+acceleration (https://docs.rc.ufl.edu/scheduler/gpu_access/). Put
+`--job-name=marimo-ws` in **Additional SLURM Options** (long-form flags only).
+Open a terminal in the desktop, then, from the repo root:
 
 ```bash
 cd /blue/TODO_GROUP/$USER/marimo-workshop
@@ -124,11 +133,13 @@ scripts/port_forward.sh marimo-ws 2718
 # http://localhost:2718  (add the ?access_token=... marimo printed)
 ```
 
-`port_forward.sh` expects an ssh alias `hpg` (override with `HPG_HOST`):
+`port_forward.sh` expects an ssh alias `hpg` (override with `HPG_HOST`).
+The login host and this ControlMaster block match RC's example
+(https://docs.rc.ufl.edu/interfaces/terminal/):
 
 ```sshconfig
 Host hpg
-    HostName hpg.rc.ufl.edu        # TODO(HPG): confirm login host
+    HostName hpg.rc.ufl.edu
     User your_gatorlink
     ControlMaster auto             # one login (and one MFA prompt) per session
     ControlPath ~/.ssh/cm-%r@%h-%p
