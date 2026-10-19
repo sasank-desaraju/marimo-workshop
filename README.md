@@ -165,6 +165,9 @@ pyproject.toml              marimo project settings (NaviGator AI provider)
 .env.example                template for .env (API key)
 ```
 
+`uvx marimo check --ignore-scripts notebooks` skips `03_train.py`. Without
+`--ignore-scripts`, check stops on that script.
+
 ## Where runs go
 
 `01_preprocess.py` writes `data/processed/mnist1d.npz` and
