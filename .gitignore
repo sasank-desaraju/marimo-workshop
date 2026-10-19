@@ -1,0 +1,24 @@
+# Secrets
+.env
+
+# Run outputs
+runs/
+mlruns/
+logs/*
+!logs/.gitkeep
+slurm-*.out
+
+# Python and tooling
+__pycache__/
+*.py[cod]
+.venv/
+.ipynb_checkpoints/
+__marimo__/
+.ruff_cache/
+
+# OS / editor
+.DS_Store
+.vscode/
+
+# Packaged copies of this repo
+*.tar.gz

@@ -1,0 +1,22 @@
+# Draft. Validate with: uvx cffconvert --validate
+cff-version: 1.2.0
+message: "If you use these materials, please cite them as below."
+type: software
+title: "Marimo on HiPerGator: workshop materials"
+version: 0.1.0
+date-released: 2026-10-22
+license: MIT
+authors:
+  - family-names: Desaraju
+    given-names: Sasank
+    # TODO: affiliation, e.g. "University of Florida"
+    # TODO: orcid: "https://orcid.org/0000-0000-0000-0000"
+# TODO: add co-presenter Piyush if co-authoring
+# TODO: repository-code: "https://github.com/<owner>/marimo-workshop"
+keywords:
+  - marimo
+  - HiPerGator
+  - Slurm
+  - PyTorch
+  - MLflow
+  - reproducible notebooks
