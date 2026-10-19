@@ -32,7 +32,7 @@ def _():
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    # Hello, HiPerGator 👋
+    # Hello, HiPerGator! 🐊
 
     A marimo notebook is a plain Python file where cells form a **dataflow
     graph**: when you change something, every cell that depends on it re-runs,
@@ -126,16 +126,6 @@ def _(allocated_cpus, mo, os, platform, socket, sys):
         )
     )
     mo.hstack([_host, _jobs], widths="equal", gap=2, align="start")
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    **Try this:** this file is `notebooks/00_hello_hpg_mo.py`. The `_mo.py`
-    suffix is what the JupyterLab marimo extension uses to open a file in
-    marimo on double-click. The pipeline notebooks are plain `.py`.
-    """)
     return
 
 
