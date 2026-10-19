@@ -1,9 +1,9 @@
 # Secrets
 .env
 
-# Run outputs
+# Run outputs and the arrays written by notebooks/01_preprocess.py
 runs/
-mlruns/
+data/processed/
 logs/*
 !logs/.gitkeep
 slurm-*.out
@@ -16,6 +16,7 @@ __pycache__/
 .ipynb_checkpoints/
 __marimo__/
 .ruff_cache/
+.pytest_cache/
 
 # OS / editor
 .DS_Store

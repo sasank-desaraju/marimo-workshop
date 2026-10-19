@@ -18,5 +18,5 @@ keywords:
   - HiPerGator
   - Slurm
   - PyTorch
-  - MLflow
+  - MNIST-1D
   - reproducible notebooks

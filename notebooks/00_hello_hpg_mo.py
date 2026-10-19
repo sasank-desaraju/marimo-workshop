@@ -7,6 +7,8 @@
 # ]
 # ///
 
+# Only this file uses the *_mo.py suffix, so JupyterLab opens it in marimo on double-click.
+
 import marimo
 
 __generated_with = "0.25.1"
@@ -130,8 +132,9 @@ def _(allocated_cpus, mo, os, platform, socket, sys):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    **Try this:** the notebook is just `notebooks/00_hello_hpg.py`. Open it in
-    any editor, or run it as a script with `python notebooks/00_hello_hpg.py`.
+    **Try this:** this file is `notebooks/00_hello_hpg_mo.py`. The `_mo.py`
+    suffix is what the JupyterLab marimo extension uses to open a file in
+    marimo on double-click. The pipeline notebooks are plain `.py`.
     """)
     return
 

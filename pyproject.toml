@@ -11,11 +11,11 @@ dependencies = [
     "altair",
     "marimo",
     "matplotlib",
-    "mlflow-skinny",
     "mnist1d",
     "numpy",
     "openai",   # marimo's AI chat panel talks to NaviGator through this
     "pandas",
+    "pytest",
     "torch",
 ]
 

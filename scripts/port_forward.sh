@@ -7,8 +7,8 @@
 #   PORT      2718 (same port on both ends) or LOCAL:REMOTE, e.g. 8080:2718
 #
 # Examples:
-#   scripts/port_forward.sh marimo-ws 2718 5000   # marimo + MLflow in one job
-#   scripts/port_forward.sh mlflow-ws 5000
+#   scripts/port_forward.sh marimo-ws 2718
+#   scripts/port_forward.sh marimo-ws 8080:2718
 #
 # Env:
 #   HPG_HOST  ssh host or ~/.ssh/config alias for the HPG login node (default: hpg)
