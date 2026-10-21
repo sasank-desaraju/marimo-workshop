@@ -1,0 +1,116 @@
+/* marimo theme matching omop.scss (UF palette, as in the Marimo 101 deck).
+   Loaded by sql-basics-marimo.py via marimo.App(css_file="omop-marimo.css");
+   marimo export html / html-wasm inline it into the page. */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  /* UF palette (omop.scss) */
+  --uf-blue: #0021A5;
+  --uf-orange: #FA4616;
+  --uf-dark-blue: #002657;
+  --uf-gray: #C7C9C8;
+  --uf-slate: #343741;
+  --uf-code-red: #D32737;
+
+  /* light-mode roles */
+  --omop-body: var(--uf-blue);
+  --omop-heading: var(--uf-orange);
+  --omop-strong: var(--uf-orange);
+  --omop-code: var(--uf-code-red);
+  --omop-link: var(--uf-blue);
+  --omop-link-hover: var(--uf-orange);
+  --omop-zebra: rgba(199, 201, 200, .25);
+  --omop-quote-bg: rgba(199, 201, 200, .25);
+  --omop-quote-ink: #000;
+
+  --marimo-text-font: Georgia, "Times New Roman", serif;
+  --marimo-heading-font: Aptos, Calibri, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --marimo-monospace-font: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+}
+
+/* marimo's dark theme puts .dark / .dark-theme on an ancestor: keep the palette, lift the contrast */
+.dark, .dark-theme {
+  --omop-body: #D5DBF7;
+  --omop-heading: #FF8A5C;
+  --omop-strong: #FFB08F;
+  --omop-code: #FF8A8A;
+  --omop-link: #9FB4FF;
+  --omop-link-hover: #FF8A5C;
+  --omop-zebra: rgba(199, 201, 200, .08);
+  --omop-quote-bg: rgba(199, 201, 200, .10);
+  --omop-quote-ink: #E6E7E6;
+}
+
+/* Markdown text: marimo renders it with Tailwind typography, so set the prose variables */
+:root .prose, :root .markdown {
+  --tw-prose-body: var(--omop-body);
+  --tw-prose-headings: var(--omop-heading);
+  --tw-prose-bold: var(--omop-strong);
+  --tw-prose-code: var(--omop-code);
+  --tw-prose-links: var(--omop-link);
+  --tw-prose-bullets: var(--uf-gray);
+  --tw-prose-counters: var(--omop-body);
+  --tw-prose-quotes: var(--omop-quote-ink);
+  --tw-prose-quote-borders: var(--uf-orange);
+  --tw-prose-th-borders: var(--uf-gray);
+  --link: var(--omop-link);
+  color: var(--omop-body);
+}
+
+:root .markdown :is(h1, h2, h3, h4) {
+  color: var(--omop-heading);
+  font-family: var(--marimo-heading-font);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+:root .markdown strong { color: var(--omop-strong); }
+:root .markdown a { color: var(--omop-link); }
+:root .markdown a:hover { color: var(--omop-link-hover); }
+:root .markdown hr { border-color: var(--uf-gray); }
+
+/* Inline code: UF code red, like the deck */
+:root .markdown :not(pre) > code {
+  color: var(--omop-code);
+  font-family: var(--marimo-monospace-font);
+}
+
+/* Code blocks (mo.md fences and show_sql): dark slate with an orange left rule */
+:root .markdown .codehilite {
+  background-color: var(--uf-slate);
+  border-left: 4px solid var(--uf-orange);
+  border-radius: 0 6px 6px 0;
+}
+:root .markdown .codehilite pre {
+  background-color: var(--uf-slate);
+  color: #fff;
+  padding: .5em .8em;
+  font-family: var(--marimo-monospace-font);
+}
+:root .markdown .codehilite code { color: #fff; background: transparent; }
+:root .markdown .codehilite :is(span, .n, .nv, .na, .nx, .nc, .nt, .w) { color: #fff; }
+:root .markdown .codehilite :is(.k, .kd, .kr, .kn, .kc, .ow) { color: #FF9A73; font-weight: 600; }  /* keywords: light UF orange */
+:root .markdown .codehilite :is(.nf, .nb) { color: #9FB4FF; }                                       /* functions */
+:root .markdown .codehilite :is(.mi, .mf, .m, .il) { color: #FFD166; }                              /* numbers */
+:root .markdown .codehilite :is(.s, .s1, .s2, .se, .sb, .sd) { color: #8FD6A8; }                    /* strings */
+:root .markdown .codehilite :is(.c, .c1, .cm, .cs) { color: #A9ABB3; font-style: italic; }          /* comments */
+:root .markdown .codehilite :is(.o, .p) { color: #D5D7DC; }
+
+/* Markdown tables: UF blue header, zebra rows */
+:root .markdown table thead,
+:root .markdown table thead th {
+  background-color: var(--uf-blue);
+  color: #fff;
+}
+:root .markdown table tbody tr:nth-child(even) { background-color: var(--omop-zebra); }
+:root .markdown table :is(th, td) { padding: .35em .7em; }
+
+/* Blockquotes ("> 💡 In marimo: …" notes) */
+:root .markdown blockquote {
+  border-left: 5px solid var(--uf-orange);
+  background: var(--omop-quote-bg);
+  color: var(--omop-quote-ink);
+  padding: .5em 1em;
+  font-style: italic;
+}
+:root .markdown blockquote p { color: var(--omop-quote-ink); }

@@ -1,0 +1,1043 @@
+---
+title: "Marimo 101"
+subtitle: "Reactive notebooks for teaching clinical data science"
+author: "Piyush Chaudhari"
+date: '2026-10-22'
+description: "Who I am, why teaching and data democratization need better notebooks, and the same OMOP lesson as a Quarto deck, a marimo notebook and a Jupyter notebook"
+# categories: ["Slides", "Week 6"]
+engine: marimo
+# Where the notebooks live. Fix these once and every molab / Colab / Pages link updates.
+repo-path: "pc-piyush/F26_Marimo/blob/main/PC"
+pages-url: "https://pc-piyush.github.io/F26_Marimo/PC/docs/marimo/"
+format:
+  revealjs:
+    axe:
+        output: console
+    slide-number: true
+    chalkboard:
+        buttons: true
+    preview-links: auto
+    logo: photos/PC_UF.png
+    theme: [default, omop.scss]
+    width: 1280
+    height: 760
+    margin: 0.06
+    scrollable: true
+    hash: true
+    transition: none
+    code-copy: true
+    mermaid:
+      theme: neutral
+pyproject: |
+  requires-python = ">=3.10"
+  dependencies = [
+      "marimo[sql]>=0.23.16",
+      "duckdb",
+      "pandas",
+      "numpy",
+      "altair",
+  ]
+header: |
+  import marimo as mo
+  import numpy as np
+  import pandas as pd
+  import altair as alt
+  import duckdb
+  from pathlib import Path
+
+footer: "[Marimo 101](https://github.com/GatorAIM/gms6803-clinical-data-science)"
+---
+
+## About me
+
+::::: columns
+::: {.column width="30%"}
+<!-- Swap in a headshot here if you prefer: photos/<your-photo>.png -->
+![](photos/Piyush.png){width="230" fig-alt="Piyush Chaudhari's pc monogram"}
+
+::: small
+[pc-piyush.github.io](https://pc-piyush.github.io) · [GitHub](https://github.com/pc-piyush)
+
+[Google Scholar](https://scholar.google.com/citations?hl=en&user=gGrOPjwAAAAJ) · [LinkedIn](https://www.linkedin.com/in/piyush-chaudhari/)
+:::
+:::
+
+::: {.column width="70%"}
+**Piyush Chaudhari**
+
+- **Data Management Analyst III**, [UF Health Integrated Data Repository](https://idr.ufhealth.org) (2023–)
+- **PhD student, Biomedical Informatics**, University of Florida (2025–)
+  - *Emerging Research Scholars* PhD Fellow
+- MS Biostatistics, University of Florida · BTech Biotechnology, VIT
+
+**Research interests:** statistical machine learning in clinical informatics, including clinical decision support, patient representation learning, phenotyping, privacy-preserving learning, and **data democratization**
+
+<!-- ::: muted
+UF Superior Accomplishment Award: university-level Gold Award (2025)
+::: -->
+:::
+:::::
+
+<!-- ## My work: getting clinical data to researchers
+
+::::: columns
+::: {.column width="48%"}
+At the **UF Health IDR**, I turn EHR data into research-ready data, safely
+
+- **ETL pipelines** that load and validate data in the **OMOP**, **PCORnet** and **i2b2** common data models
+- Curating **Epic Clarity** and **Caboodle** data for interdisciplinary research
+- **Honest broker**: giving researchers data under IRB-approved protocols
+- A patient-centric **Digital Twin** in i2b2 for cohort phenotyping
+
+```{=html}
+<div style="display:flex;gap:14px;margin-top:.6em">
+  <div style="border-left:5px solid #FA4616;padding:4px 12px"><div style="font:700 1.4em Georgia,serif;color:#0021A5">10×</div><div style="font-size:.55em;color:#5F6168">faster clinical notes<br/>and order reports</div></div>
+  <div style="border-left:5px solid #FA4616;padding:4px 12px"><div style="font:700 1.4em Georgia,serif;color:#0021A5">5×</div><div style="font-size:.55em;color:#5F6168">faster delivery<br/>through OMOP</div></div>
+  <div style="border-left:5px solid #FA4616;padding:4px 12px"><div style="font:700 1.4em Georgia,serif;color:#0021A5">5×</div><div style="font-size:.55em;color:#5F6168">faster custom<br/>de-identification</div></div>
+</div>
+```
+:::
+
+::: {.column width="52%"}
+```{mermaid}
+%%| fig-width: 6
+flowchart TD
+    ehr["<b>EHR</b><br/>Epic Clarity · Caboodle"]
+    cdm["<b>Common data models</b><br/>OMOP · PCORnet · i2b2"]
+    tools["<b>Self-service tools</b><br/>i2b2 · OHDSI ATLAS"]
+    people["<b>Researchers and learners</b><br/>clinicians · students · OneFlorida+ partners"]
+    ehr -- "ETL + validation" --> cdm
+    cdm -- "de-identification<br/>honest broker" --> tools
+    tools -- "training<br/>and teaching" --> people
+    style cdm fill:#0021A5,color:#fff,stroke:#0021A5
+    style people fill:#FA4616,color:#fff,stroke:#FA4616
+```
+
+::: muted
+**Data democratization:** the same data, in the same shape, usable by more people, with less waiting
+:::
+:::
+::::: --> 
+
+## Teaching: from data access to data skills
+
+::::: columns
+::: {.column width="50%"}
+- Helping design the syllabus for **GMS 6803: Data Science for Clinical Research** (Fall 2026), with Drs. Yi Guo and Mei Liu
+- **i2b2** and **OHDSI ATLAS** training workshops for clinicians, researchers and **OneFlorida+** partners (2023–)
+- Mentoring undergraduate research (EGN 4912, Spring 2026)
+
+::: muted
+Access is only half of democratization. People also need to be able to **ask their own questions** of the data
+:::
+:::
+
+::: {.column width="50%"}
+**What teaching material needs**
+
+| Need | How we get it |
+|------------------|------------------|
+| Same data for everyone | A common data model (**OMOP**) |
+| Safe to share | **Synthetic** patients, real concept IDs |
+| Nothing to install | Python in the **browser** (WebAssembly) |
+| Every step visible | **Reactive** notebooks |
+| Learners can change it | Editable, runnable files |
+
+::: muted
+That last row is what today is about
+:::
+:::
+:::::
+
+## Notebooks for teaching {.center .uf-section background-gradient="linear-gradient(180deg, #002657 0%, #0021A5 100%)"}
+
+One OMOP SQL lesson, built three ways: Quarto · marimo · Jupyter
+
+## One lesson, three notebooks
+
+::::: columns
+::: {.column width="42%"}
+**The lesson:** SQL on a synthetic OMOP extract, taught through marimo's features (reactivity, SQL cells, widgets, interactive charts and tables, forms)
+
+**The same content, three ways**, so you can compare how each tool
+
+- **runs** your code
+- handles **interactivity**
+- gets **shared** with learners
+:::
+
+::: {.column width="58%"}
+::: small
+| Version | File | Run it |
+|------------------|------------------|------------------|
+| **Quarto deck** (marimo engine) | `sql-basics.qmd` | [slides](sql-basics.html) |
+| **marimo notebook** | `sql-basics-marimo.py` | [molab](https://molab.marimo.io/github/{{< meta repo-path >}}/sql-basics-marimo.py) · [in your browser]({{< meta pages-url >}}) · [file](sql-basics-marimo.py) |
+| **Jupyter notebook** | `sql-basics-jupyter.ipynb` | [Colab](https://colab.research.google.com/github/{{< meta repo-path >}}/sql-basics-jupyter.ipynb) · [file](sql-basics-jupyter.ipynb) |
+:::
+
+::: muted
+All three have the same sections in the same order. The marimo and Jupyter notebooks add a full SQL appendix
+:::
+:::
+:::::
+
+```{python .marimo}
+#| output: false
+# ---------------------------------------------------------------
+# Synthetic OMOP CDM v5.4 subset stored in omop.duckdb.
+# Concept IDs are real standard OMOP concepts; people, dates and
+# values are simulated. Rebuild with: uv run build_omop_db.py
+# ---------------------------------------------------------------
+# Resolve relative to this document, not wherever quarto was launched from.
+DB_PATH = (mo.notebook_dir() or Path.cwd()) / "omop.duckdb"
+if DB_PATH.exists():
+    con = duckdb.connect(str(DB_PATH), read_only=True)
+else:
+    # In the browser (Pyodide) omop.duckdb is not on the virtual
+    # filesystem, so rebuild the same seeded tables in memory.
+    # Keep in sync with build_omop_db.py.
+    _rng = np.random.default_rng(42)
+    _N = 1200
+    _t0 = pd.Timestamp("2016-01-01")
+    _span = (pd.Timestamp("2024-12-31") - _t0).days
+
+    _concept = pd.DataFrame(
+        [
+            (8507, "MALE", "Gender", "Gender"),
+            (8532, "FEMALE", "Gender", "Gender"),
+            (8527, "White", "Race", "Race"),
+            (8516, "Black or African American", "Race", "Race"),
+            (8515, "Asian", "Race", "Race"),
+            (38003563, "Hispanic or Latino", "Ethnicity", "Ethnicity"),
+            (38003564, "Not Hispanic or Latino", "Ethnicity", "Ethnicity"),
+            (9201, "Inpatient Visit", "Visit", "Visit"),
+            (9202, "Outpatient Visit", "Visit", "Visit"),
+            (9203, "Emergency Room Visit", "Visit", "Visit"),
+            (201826, "Type 2 diabetes mellitus", "Condition", "SNOMED"),
+            (320128, "Essential hypertension", "Condition", "SNOMED"),
+            (317576, "Coronary arteriosclerosis", "Condition", "SNOMED"),
+            (255573, "Chronic obstructive lung disease", "Condition", "SNOMED"),
+            (46271022, "Chronic kidney disease", "Condition", "SNOMED"),
+            (433736, "Obesity", "Condition", "SNOMED"),
+            (4329847, "Myocardial infarction", "Condition", "SNOMED"),
+            (440383, "Depressive disorder", "Condition", "SNOMED"),
+            (197320, "Acute renal failure syndrome", "Condition", "SNOMED"),
+            (1503297, "metformin", "Drug", "RxNorm"),
+            (1308216, "lisinopril", "Drug", "RxNorm"),
+            (1545958, "atorvastatin", "Drug", "RxNorm"),
+            (1112807, "aspirin", "Drug", "RxNorm"),
+            (1307046, "metoprolol", "Drug", "RxNorm"),
+            (1332418, "amlodipine", "Drug", "RxNorm"),
+            (3004410, "Hemoglobin A1c/Hemoglobin.total in Blood", "Measurement", "LOINC"),
+            (3016723, "Creatinine [Mass/volume] in Serum or Plasma", "Measurement", "LOINC"),
+            (3004249, "Systolic blood pressure", "Measurement", "LOINC"),
+        ],
+        columns=["concept_id", "concept_name", "domain_id", "vocabulary_id"],
+    )
+
+    # person -------------------------------------------------------------
+    _person = pd.DataFrame({
+        "person_id": np.arange(1, _N + 1),
+        "gender_concept_id": _rng.choice([8507, 8532], _N, p=[.48, .52]),
+        "year_of_birth": _rng.integers(1935, 2006, _N),
+        "month_of_birth": _rng.integers(1, 13, _N),
+        "race_concept_id": _rng.choice([8527, 8516, 8515, 0], _N, p=[.6, .2, .08, .12]),
+        "ethnicity_concept_id": _rng.choice([38003563, 38003564], _N, p=[.25, .75]),
+    })
+    _age = dict(zip(_person.person_id, 2024 - _person.year_of_birth))
+
+    # visit_occurrence ---------------------------------------------------
+    _nv = (_rng.poisson(4, _N) + 1).astype(np.intp)  # np.repeat needs intp (int32 in WASM)
+    _vp = np.repeat(_person.person_id.values, _nv)
+    _V = len(_vp)
+    _vtype = _rng.choice([9201, 9202, 9203], _V, p=[.12, .75, .13])
+    _vstart = _t0 + pd.to_timedelta(_rng.integers(0, _span, _V), unit="D")
+    _los = np.where(_vtype == 9201, _rng.integers(1, 11, _V), 0)
+    _visit = pd.DataFrame({
+        "visit_occurrence_id": np.arange(1, _V + 1),
+        "person_id": _vp,
+        "visit_concept_id": _vtype,
+        "visit_start_date": _vstart,
+        "visit_end_date": _vstart + pd.to_timedelta(_los, unit="D"),
+    })
+    _by_person = {p: g for p, g in _visit.groupby("person_id")}
+
+    # condition_occurrence ------------------------------------------------
+    _base = {201826: .16, 320128: .28, 317576: .09, 255573: .07, 46271022: .06,
+             433736: .15, 4329847: .03, 440383: .12, 197320: .04}
+    _crow = []
+    for _pid, _g in _by_person.items():
+        _scale = 0.35 + _age[_pid] / 55
+        for _cid, _p in _base.items():
+            if _rng.random() < min(_p * _scale, .85):
+                _v = _g.iloc[_rng.integers(0, len(_g))]
+                _crow.append((_pid, _cid, _v.visit_start_date, _v.visit_occurrence_id))
+    _cond = pd.DataFrame(_crow, columns=["person_id", "condition_concept_id",
+                                         "condition_start_date", "visit_occurrence_id"])
+    _cond.insert(0, "condition_occurrence_id", np.arange(1, len(_cond) + 1))
+    _has = _cond.groupby("person_id").condition_concept_id.apply(set).to_dict()
+
+    # drug_exposure -------------------------------------------------------
+    _drow = []
+    for _pid, _g in _by_person.items():
+        _cs = _has.get(_pid, set())
+        if 201826 in _cs and _rng.random() < .72:
+            _d0 = _cond[(_cond.person_id == _pid) & (_cond.condition_concept_id == 201826)].condition_start_date.iloc[0]
+            _drow.append((_pid, 1503297, _d0 + pd.Timedelta(days=int(_rng.integers(0, 240)))))
+        if 320128 in _cs:
+            for _dc in (1308216, 1332418):
+                if _rng.random() < .45:
+                    _drow.append((_pid, _dc, _g.visit_start_date.iloc[_rng.integers(0, len(_g))]))
+        if _cs & {317576, 4329847}:
+            for _dc in (1545958, 1112807, 1307046):
+                if _rng.random() < .6:
+                    _drow.append((_pid, _dc, _g.visit_start_date.iloc[_rng.integers(0, len(_g))]))
+    _drug = pd.DataFrame(_drow, columns=["person_id", "drug_concept_id", "drug_exposure_start_date"])
+    _drug["days_supply"] = _rng.choice([30, 90], len(_drug))
+    _drug["drug_exposure_end_date"] = _drug.drug_exposure_start_date + pd.to_timedelta(_drug.days_supply, unit="D")
+    _drug.insert(0, "drug_exposure_id", np.arange(1, len(_drug) + 1))
+
+    # measurement ---------------------------------------------------------
+    _mrow = []
+    for _v in _visit.itertuples():
+        _cs = _has.get(_v.person_id, set())
+        if _rng.random() < .35:
+            _a1c = _rng.normal(7.9, 1.3) if 201826 in _cs else _rng.normal(5.4, .35)
+            _mrow.append((_v.person_id, 3004410, _v.visit_start_date, round(max(_a1c, 4.0), 1), "%"))
+        if _rng.random() < .6:
+            _cr = _rng.lognormal(0, .2) * (1.9 if 197320 in _cs and _rng.random() < .5 else 1.0)
+            _cr *= 1.35 if 46271022 in _cs else 1.0
+            _mrow.append((_v.person_id, 3016723, _v.visit_start_date, round(_cr, 2), "mg/dL"))
+        if _rng.random() < .8:
+            _sbp = _rng.normal(141 if 320128 in _cs else 122, 13)
+            _mrow.append((_v.person_id, 3004249, _v.visit_start_date, round(_sbp), "mmHg"))
+    _meas = pd.DataFrame(_mrow, columns=["person_id", "measurement_concept_id",
+                                         "measurement_date", "value_as_number", "unit_source_value"])
+    _meas.insert(0, "measurement_id", np.arange(1, len(_meas) + 1))
+
+    # load into DuckDB with proper DATE columns ---------------------------
+    con = duckdb.connect()
+    for _name, _df in {"person": _person, "visit_occurrence": _visit,
+                       "condition_occurrence": _cond, "drug_exposure": _drug,
+                       "measurement": _meas, "concept": _concept}.items():
+        con.register("_tmp", _df)
+        _cols = ", ".join(
+            f"CAST({c} AS DATE) AS {c}" if c.endswith("_date") else c for c in _df.columns
+        )
+        con.execute(f"CREATE TABLE {_name} AS SELECT {_cols} FROM _tmp")
+        con.unregister("_tmp")
+
+
+def run(q):
+    """Run SQL against the OMOP connection and return a pandas DataFrame."""
+    return con.execute(q).df()
+
+
+def show_sql(q):
+    return mo.md(f"```sql\n{q.strip()}\n```")
+
+
+CLAUSE = {"select": "#0021A5", "from": "#002657", "where": "#C63A0E",
+          "join": "#6A2A60", "group": "#22884C", "having": "#7A5C00",
+          "order": "#D32737", "window": "#343741",
+          "ink": "#1A1A1A", "muted": "#5F6168"}
+
+
+def styled(chart, w=520, h=300):
+    return (chart.properties(width=w, height=h)
+            .configure(font="Georgia")
+            .configure_view(stroke=None)
+            .configure_axis(labelColor=CLAUSE["ink"], titleColor=CLAUSE["muted"],
+                            gridColor="#E6E7E6", domainColor="#C7C9C8",
+                            labelFontSize=13, titleFontSize=13)
+            .configure_legend(labelFontSize=13, titleFontSize=13))
+```
+
+## Why another notebook?
+
+::::: columns
+::: {.column width="50%"}
+Jupyter notebooks are great for exploring, but the notebook you **see** is not always the program that **runs**
+
+- Cells can be run in **any order**
+- Deleting a cell **doesn't delete** its variables
+- Widgets only update the cell they live in
+- `.ipynb` is JSON with outputs inside, so **git diffs are noisy**
+
+::: muted
+For teaching, that means a student's notebook can show results that its code no longer produces
+:::
+:::
+
+::: {.column width="50%"}
+> In a study of ~1.4 million GitHub notebooks, only **24%** ran without errors and only **4%** reproduced their saved results
+>
+> Pimentel et al., *MSR 2019*
+
+::: muted
+marimo's answer: make the notebook a **reactive program**. Each cell declares what it reads and defines, and marimo keeps every output consistent with the code
+:::
+:::
+:::::
+
+## Hidden state, live
+
+This slide runs marimo on the lesson's HbA1c results. **Move cell A**, then compare the two notebooks
+
+:::::: columns
+:::: {.column width="38%"}
+```{python .marimo}
+#| output: false
+hba1c = run("""
+SELECT value_as_number FROM measurement
+WHERE measurement_concept_id = 3004410
+""").value_as_number.to_numpy()
+get_snap, set_snap = mo.state(6.5)
+```
+
+```{python .marimo}
+thr = mo.ui.slider(4.0, 10.0, value=6.5, step=0.5, label="Cell A: threshold =",
+                   show_value=True, full_width=True)
+thr
+```
+
+```{python .marimo}
+rerun_b = mo.ui.button(label="▶ Run cell B in Jupyter",
+                       on_click=lambda _: set_snap(thr.value), kind="warn")
+rerun_b
+```
+
+::: muted
+- **Jupyter:** cell B only reruns when you run it
+- **marimo:** cell B reruns as soon as `threshold` changes
+
+The Jupyter notebook has this as a hands-on exercise
+:::
+::::
+
+::: {.column width="62%"}
+```{python .marimo}
+_stale = get_snap() != thr.value
+_n_old = int((hba1c >= get_snap()).sum())
+_n_new = int((hba1c >= thr.value).sum())
+_code = (
+    "```python\n"
+    f"# A\nthreshold = {thr.value}\n\n"
+    "# B\nn_flagged = (hba1c >= threshold).sum()\n\n"
+    "# C\nprint(f\"{n_flagged} HbA1c results ≥ {threshold}%\")\n"
+    "```"
+)
+mo.vstack([
+    mo.md(_code),
+    mo.hstack([
+        mo.callout(mo.md(
+            f"**Jupyter** · cell C prints\n\n`{_n_old} HbA1c results ≥ {thr.value}%`\n\n"
+            + (f"⚠️ B last ran with threshold = {get_snap()}" if _stale else "✓ in sync")),
+            kind="danger" if _stale else "success"),
+        mo.callout(mo.md(
+            f"**marimo** · cell C prints\n\n`{_n_new} HbA1c results ≥ {thr.value}%`\n\n"
+            "✓ always in sync"), kind="success"),
+    ], widths=[1, 1], gap=1),
+])
+```
+:::
+::::::
+
+## How marimo runs a notebook
+
+::::: columns
+::: {.column width="44%"}
+marimo reads each cell's code to find the **names it defines** and the **names it reads**. That gives a dependency graph
+
+- Change a cell → marimo reruns **everything that depends on it**, and nothing else
+- Each global name is defined in **one** cell
+- Delete a cell → its variables are **deleted** too
+- UI elements (`mo.ui.*`) are just variables, so interacting with one reruns the cells that read `.value`
+:::
+
+::: {.column width="56%"}
+```{mermaid}
+%%| fig-width: 7
+flowchart TD
+    data["<b>data cell</b><br/>con, run()"]
+    ui["<b>widget cell</b><br/>yob = mo.ui.range_slider()"]
+    sql["<b>SQL cell</b><br/>where_df = mo.sql(...)"]
+    chain["<b>SQL cell</b><br/>SELECT … FROM where_df"]
+    chart["<b>chart cell</b><br/>reads where_df"]
+    data --> sql
+    ui --> sql
+    sql --> chain
+    sql --> chart
+    style ui fill:#FA4616,color:#fff,stroke:#FA4616
+    style sql fill:#0021A5,color:#fff,stroke:#0021A5
+    style chain fill:#0021A5,color:#fff,stroke:#0021A5
+    style chart fill:#0021A5,color:#fff,stroke:#0021A5
+```
+
+::: muted
+Move the slider (orange) and only the blue cells rerun
+:::
+:::
+:::::
+
+## How each notebook is structured
+
+::: panel-tabset
+### Quarto `.qmd`
+
+````markdown
+---
+engine: marimo
+pyproject: |
+  dependencies = ["marimo[sql]", "duckdb", "altair"]
+---
+
+## UI elements and `.value`
+
+```{python .marimo}
+#| echo: true
+yob = mo.ui.range_slider(1935, 2005, value=[1950, 1975], label="Year of birth")
+yob
+```
+````
+
+::: muted
+Markdown with code blocks. Quarto owns the layout (slides, columns, theme); `engine: marimo` makes the blocks reactive cells that run in the browser
+:::
+
+### marimo `.py`
+
+```python
+# /// script
+# dependencies = ["marimo[sql]", "duckdb", "altair"]
+# ///
+import marimo
+app = marimo.App(css_file="omop-marimo.css")
+
+@app.cell
+def _(mo):
+    yob = mo.ui.range_slider(1935, 2005, value=[1950, 1975], label="Year of birth")
+    yob
+    return (yob,)
+
+@app.cell
+def _(con, mo, yob):
+    where_df = mo.sql(f"""
+        SELECT person_id FROM person
+        WHERE year_of_birth BETWEEN {yob.value[0]} AND {yob.value[1]}
+    """, engine=con)
+    return (where_df,)
+```
+
+::: muted
+Plain Python. Each cell is a function: its arguments are what it reads, its `return` is what it defines. Git-friendly, importable, and it runs with `python file.py`
+:::
+
+### Jupyter `.ipynb`
+
+```json
+{
+ "cell_type": "code",
+ "execution_count": 7,
+ "metadata": {},
+ "outputs": [
+  {"data": {"text/html": "<div><table border=\"1\" class=\"dataframe\">…"},
+   "execution_count": 7, "output_type": "execute_result"}
+ ],
+ "source": ["@w.interact(yob=w.IntRangeSlider(value=(1950, 1975), …))\n",
+            "def where_demo(yob):\n", "    display(run(sql))"]
+}
+```
+
+::: muted
+JSON, with outputs and execution counts saved inside. Re-running a cell changes the file even when the code didn't change
+:::
+:::
+
+## How each notebook runs
+
+::::: columns
+::: {.column width="33%"}
+### Quarto
+
+``` bash
+quarto preview sql-basics.qmd
+```
+
+- Renders to **static HTML** with interactive **islands**
+- Python runs in the viewer's browser (**Pyodide**)
+- Viewers can't edit the code
+
+[Open the deck](sql-basics.html)
+:::
+
+::: {.column width="34%"}
+### marimo
+
+``` bash
+uvx marimo edit --sandbox \
+  sql-basics-marimo.py
+```
+
+- A **real kernel** (local or molab), or the **browser**
+- The same file is a notebook, an **app** (`marimo run`) or a script
+- Learners edit and rerun everything
+
+[molab](https://molab.marimo.io/github/{{< meta repo-path >}}/sql-basics-marimo.py) · [in your browser]({{< meta pages-url >}})
+:::
+
+::: {.column width="33%"}
+### Jupyter
+
+``` bash
+uv run --with jupyterlab … \
+  jupyter lab sql-basics-jupyter.ipynb
+```
+
+- An IPython **kernel**; you run cells by hand
+- Widgets via **ipywidgets** callbacks
+- Huge ecosystem; Colab, Binder
+
+[Colab](https://colab.research.google.com/github/{{< meta repo-path >}}/sql-basics-jupyter.ipynb)
+:::
+:::::
+
+## Live examples {.center .uf-section background-gradient="linear-gradient(180deg, #002657 0%, #0021A5 100%)"}
+
+Running here, straight from the source files. Every example links to all three versions
+
+## Live: widgets drive a query
+
+::::: columns
+::: {.column width="56%"}
+```{python .marimo}
+ex_yob = mo.ui.range_slider(1935, 2005, value=[1950, 1975], step=1,
+                            label="Year of birth", show_value=True, full_width=True)
+ex_sex = mo.ui.dropdown({"Anyone": 0, "Female": 8532, "Male": 8507},
+                        value="Anyone", label="Sex")
+mo.hstack([ex_yob, ex_sex], widths=[3, 1], gap=1.5, align="end")
+```
+
+```{python .marimo}
+_sex_sql = "" if ex_sex.value == 0 else f"\n  AND gender_concept_id = {ex_sex.value}"
+_sql = f"""
+SELECT person_id, gender_concept_id, year_of_birth
+FROM person
+WHERE year_of_birth BETWEEN {ex_yob.value[0]} AND {ex_yob.value[1]}{_sex_sql}
+"""
+_df = run(_sql)
+mo.vstack([
+    show_sql(_sql),
+    mo.md(f"**{len(_df):,}** people match · `ex_yob.value = {tuple(ex_yob.value)}`"),
+    mo.ui.table(_df, page_size=4, selection=None),
+])
+```
+:::
+
+::: {.column width="44%"}
+::: panel-tabset
+### marimo
+
+``` python
+yob = mo.ui.range_slider(1935, 2005,
+                         value=[1950, 1975])
+yob
+```
+
+``` python
+# any other cell
+where_df = mo.sql(f"""
+  SELECT * FROM person
+  WHERE year_of_birth
+    BETWEEN {yob.value[0]} AND {yob.value[1]}
+""", engine=con)
+```
+
+### Jupyter
+
+``` python
+@w.interact(yob=w.IntRangeSlider(
+    value=(1950, 1975), min=1935, max=2005))
+def where_demo(yob):
+    sql = f"""SELECT * FROM person
+      WHERE year_of_birth
+        BETWEEN {yob[0]} AND {yob[1]}"""
+    display(run(sql))
+```
+
+Widgets and outputs must share **one** function
+:::
+
+::: small
+**Run it:** [deck](sql-basics.html#/ui-elements-and-.value) · [marimo (molab)](https://molab.marimo.io/github/{{< meta repo-path >}}/sql-basics-marimo.py) · [marimo (browser)]({{< meta pages-url >}}) · [Jupyter (Colab)](https://colab.research.google.com/github/{{< meta repo-path >}}/sql-basics-jupyter.ipynb)
+:::
+:::
+:::::
+
+## Live: one widget builds another
+
+::::: columns
+::: {.column width="56%"}
+```{python .marimo}
+ex_lab = mo.ui.dropdown(
+    {"HbA1c (%)": (3004410, 4.0, 13.0, 6.5),
+     "Creatinine (mg/dL)": (3016723, 0.3, 4.0, 1.3),
+     "Systolic BP (mmHg)": (3004249, 80.0, 190.0, 140.0)},
+    value="HbA1c (%)", label="Lab")
+```
+
+```{python .marimo}
+_cid, _lo, _hi, _default = ex_lab.value
+ex_cutoff = mo.ui.slider(_lo, _hi, value=_default, step=0.1 if _hi < 20 else 1,
+                         label="Abnormal if ≥", show_value=True, full_width=True)
+mo.hstack([ex_lab, ex_cutoff], widths=[1, 2], gap=1.5, align="end")
+```
+
+```{python .marimo}
+_m = run(f"""
+SELECT value_as_number,
+       CASE WHEN value_as_number >= {ex_cutoff.value}
+            THEN 'abnormal' ELSE 'normal' END AS flag
+FROM measurement
+WHERE measurement_concept_id = {ex_lab.value[0]}
+  AND value_as_number IS NOT NULL
+""")
+_pct = (_m.flag == "abnormal").mean() * 100 if len(_m) else 0
+_h = alt.Chart(_m).mark_bar().encode(
+    x=alt.X("value_as_number:Q", bin=alt.Bin(maxbins=40), title=None),
+    y=alt.Y("count():Q", title="results"),
+    color=alt.Color("flag:N", scale=alt.Scale(domain=["abnormal", "normal"],
+                                               range=[CLAUSE["order"], "#B3BCE3"]),
+                    legend=alt.Legend(orient="top", title=None)),
+)
+_rule = alt.Chart(pd.DataFrame({"x": [ex_cutoff.value]})).mark_rule(
+    color=CLAUSE["ink"], strokeDash=[5, 4], strokeWidth=2).encode(x="x:Q")
+mo.vstack([mo.md(f"**{_pct:.1f}%** of {len(_m):,} results flagged abnormal"),
+           styled(_h + _rule, w=560, h=200)])
+```
+:::
+
+::: {.column width="44%"}
+::: panel-tabset
+### marimo
+
+``` python
+# the slider is built from the dropdown
+_cid, lo, hi, default = lab_pick.value
+cutoff = mo.ui.slider(lo, hi, value=default)
+cutoff
+```
+
+A new lab rebuilds the slider: it's just another cell
+
+### Jupyter
+
+``` python
+def reset_slider(change):
+    _, lo, hi, default = LABS[change["new"]]
+    with cutoff.hold_trait_notifications():
+        cutoff.min, cutoff.max = lo, hi
+        cutoff.value = default
+    draw_lab()
+
+lab_pick.observe(reset_slider, names="value")
+cutoff.observe(draw_lab, names="value")
+```
+
+Callbacks, an `Output` widget, and care with `min` / `max`
+:::
+
+::: small
+**Run it:** [deck](sql-basics.html#/ui-that-depends-on-ui) · [marimo (molab)](https://molab.marimo.io/github/{{< meta repo-path >}}/sql-basics-marimo.py) · [marimo (browser)]({{< meta pages-url >}}) · [Jupyter (Colab)](https://colab.research.google.com/github/{{< meta repo-path >}}/sql-basics-jupyter.ipynb)
+:::
+:::
+:::::
+
+## Live: click a chart, query the selection
+
+::::: columns
+::: {.column width="56%"}
+**Click a bar** (shift-click for several)
+
+```{python .marimo}
+_bands = run("""
+SELECT CASE
+         WHEN 2024 - year_of_birth < 40 THEN '18–39'
+         WHEN 2024 - year_of_birth < 65 THEN '40–64'
+         ELSE '65+'
+       END AS age_band,
+       COUNT(*) AS people
+FROM person
+GROUP BY 1
+ORDER BY 1
+""")
+# No cornerRadiusEnd here: combined with a selection, marimo islands draw the bars invisible.
+ex_age_chart = mo.ui.altair_chart(
+    styled(alt.Chart(_bands).mark_bar(color=CLAUSE["select"]).encode(
+        x=alt.X("age_band:N", title=None, axis=alt.Axis(labelAngle=0)),
+        y=alt.Y("people:Q", title="people"),
+    ), w=300, h=220),
+    chart_selection="point",
+)
+```
+
+```{python .marimo}
+_sel = ex_age_chart.value
+_picked = sorted(_sel["age_band"].unique()) if len(_sel) else ["18–39", "40–64", "65+"]
+_in = ", ".join(f"'{b}'" for b in _picked)
+_top = run(f"""
+WITH banded AS (
+  SELECT person_id,
+         CASE WHEN 2024 - year_of_birth < 40 THEN '18–39'
+              WHEN 2024 - year_of_birth < 65 THEN '40–64'
+              ELSE '65+' END AS age_band
+  FROM person
+)
+SELECT c.concept_name AS condition, COUNT(DISTINCT b.person_id) AS patients
+FROM banded AS b
+JOIN condition_occurrence AS co ON b.person_id = co.person_id
+JOIN concept AS c ON co.condition_concept_id = c.concept_id
+WHERE b.age_band IN ({_in})
+GROUP BY 1 ORDER BY 2 DESC LIMIT 5
+""")
+mo.hstack([
+    ex_age_chart,
+    mo.vstack([mo.md(f"Selected: **{', '.join(_picked)}**"),
+               mo.ui.table(_top, selection=None, page_size=5)]),
+], widths=[1, 1], gap=1)
+```
+:::
+
+::: {.column width="44%"}
+::: panel-tabset
+### marimo
+
+``` python
+age_chart = mo.ui.altair_chart(
+    chart, chart_selection="point")
+age_chart
+```
+
+``` python
+# any other cell
+age_chart.value   # selected rows, as a DataFrame
+```
+
+### Jupyter
+
+``` python
+pick = alt.selection_point(fields=["age_band"],
+                           name="pick")
+age_chart = alt.JupyterChart(
+    chart.add_params(pick))      # needs anywidget
+
+def draw_bands(*_):
+    sel = age_chart.selections.pick.value
+    with band_out: ...
+
+age_chart.selections.observe(draw_bands, ["pick"])
+```
+:::
+
+::: small
+**Run it:** [deck](sql-basics.html#/interactive-charts) · [marimo (molab)](https://molab.marimo.io/github/{{< meta repo-path >}}/sql-basics-marimo.py) · [marimo (browser)]({{< meta pages-url >}}) · [Jupyter (Colab)](https://colab.research.google.com/github/{{< meta repo-path >}}/sql-basics-jupyter.ipynb)
+:::
+:::
+:::::
+
+## Live: a form that runs once
+
+::::: columns
+::: {.column width="56%"}
+```{python .marimo}
+ex_search = mo.md("""
+{pattern}
+
+{ci}
+""").batch(
+    pattern=mo.ui.text(value="%chronic%", label="Concept name pattern"),
+    ci=mo.ui.switch(value=True, label="Case-insensitive"),
+).form(submit_button_label="Search")
+ex_search
+```
+
+```{python .marimo}
+mo.stop(ex_search.value is None,
+        mo.callout(mo.md("Press **Search**. Nothing runs until you submit. Try `%disease` or `_etformin`"), kind="info"))
+_v = ex_search.value
+_found = run(f"""
+SELECT concept_id, concept_name, domain_id, vocabulary_id
+FROM concept
+WHERE concept_name {'ILIKE' if _v['ci'] else 'LIKE'} '{_v['pattern'].replace("'", "''")}'
+ORDER BY domain_id, concept_name
+""")
+mo.vstack([mo.md(f"`ex_search.value = {_v}` · **{len(_found)}** concepts"),
+           mo.ui.table(_found, page_size=5, selection=None)])
+```
+:::
+
+::: {.column width="44%"}
+::: panel-tabset
+### marimo
+
+``` python
+search = mo.md("{pattern} {ci}").batch(
+    pattern=mo.ui.text(value="%chronic%"),
+    ci=mo.ui.switch(value=True),
+).form(submit_button_label="Search")
+```
+
+``` python
+# any other cell
+mo.stop(search.value is None)
+search.value   # {'pattern': ..., 'ci': ...}
+```
+
+### Jupyter
+
+``` python
+@w.interact_manual(
+    pattern=w.Text(value="%chronic%"),
+    ci=w.Checkbox(value=True),
+)
+def search(pattern, ci):
+    display(run(f"... LIKE '{pattern}'"))
+```
+
+The values exist only inside `search()`
+:::
+
+::: small
+**Run it:** [deck](sql-basics.html#/forms-batch-inputs-run-once) · [marimo (molab)](https://molab.marimo.io/github/{{< meta repo-path >}}/sql-basics-marimo.py) · [marimo (browser)]({{< meta pages-url >}}) · [Jupyter (Colab)](https://colab.research.google.com/github/{{< meta repo-path >}}/sql-basics-jupyter.ipynb)
+:::
+:::
+:::::
+
+## Live: the whole marimo notebook
+
+```{=html}
+<iframe data-src="{{< meta pages-url >}}" loading="lazy" width="100%" height="560"
+        style="border:1px solid #C7C9C8;border-radius:6px" title="sql-basics-marimo.py running in the browser"></iframe>
+```
+
+::: small
+`sql-basics-marimo.py`, exported with `marimo export html-wasm` and hosted on GitHub Pages. It runs entirely in your browser · [open in a new tab]({{< meta pages-url >}}) · [open on molab](https://molab.marimo.io/github/{{< meta repo-path >}}/sql-basics-marimo.py)
+:::
+
+## Side by side
+
+::: small
+|  | Quarto + marimo | Native marimo | Jupyter |
+|------------------|------------------|------------------|------------------|
+| **File** | `.qmd` (Markdown) | `.py` (Python) | `.ipynb` (JSON + outputs) |
+| **Execution** | Reactive | Reactive | Manual, any order |
+| **Hidden state** | No | No | Yes |
+| **Widgets across cells** | Automatic | Automatic | Callbacks |
+| **SQL** | `{sql .marimo}` blocks | SQL cells → DataFrames | Strings in Python (or `%%sql`) |
+| **Clickable tables / charts** | Charts (tables display only) | Both | Charts via `JupyterChart`; no built-in table |
+| **Where Python runs** | Pyodide in the browser | Local kernel, molab, or Pyodide | Local or remote kernel |
+| **Learners can edit** | No | Yes | Yes (with a kernel) |
+| **Git diffs** | Clean | Clean | Noisy |
+| **Share as** | Static website | molab link, WASM page, app | Colab, Binder, nbviewer |
+| **Best for** | Lecture decks, course sites | Labs, reproducible analyses, apps | Ad-hoc exploration, existing ecosystem |
+:::
+
+## Sharing with learners
+
+::::: columns
+::: {.column width="48%"}
+**molab**: marimo's hosted notebooks, like Colab for marimo
+
+``` text
+https://molab.marimo.io/github/<owner>/<repo>/blob/<branch>/<file>.py
+```
+
+- Opens any notebook on GitHub
+- Add `/wasm` to run it in the viewer's browser, with no login
+
+**GitHub Pages**: a static site that runs Python in the browser
+
+``` bash
+uvx marimo export html-wasm sql-basics-marimo.py \
+  -o docs/marimo --mode run
+```
+
+::: muted
+Add an empty `.nojekyll` at the root of the Pages site, or files starting with `_` go missing
+:::
+:::
+
+::: {.column width="52%"}
+```{mermaid}
+%%| fig-width: 6
+flowchart LR
+    ipynb["sql-basics-jupyter.ipynb"]
+    py["sql-basics-marimo.py"]
+    qmd["sql-basics.qmd"]
+    site["GitHub Pages<br/>(HTML + WASM)"]
+    molab["molab"]
+    slides["reveal.js slides"]
+    ipynb -- "marimo convert" --> py
+    py -- "marimo export ipynb" --> ipynb
+    py -- "export html-wasm" --> site
+    py -- "push to GitHub" --> molab
+    qmd -- "quarto render" --> slides
+    style py fill:#0021A5,color:#fff,stroke:#0021A5
+```
+:::
+:::::
+
+## Which one, when?
+
+::::: columns
+::: {.column width="33%"}
+### Quarto
+
+- You're **presenting** or publishing
+- You need full control of layout and theme
+- Readers should see results, not edit code
+:::
+
+::: {.column width="34%"}
+### marimo
+
+- Learners should **run and change** the analysis
+- You want reproducible, git-friendly notebooks
+- The notebook should also work as an **app**
+:::
+
+::: {.column width="33%"}
+### Jupyter
+
+- You're **exploring** on your own
+- You need a Jupyter-only extension or kernel (R, Julia)
+- Your platform already runs on `.ipynb`
+:::
+:::::
+
+::: muted
+For this course: **teach from the Quarto deck**, **practise in the marimo notebook**, and use the Jupyter version to see what reactivity saves you
+:::
+
+## Try it yourself
+
+1. **Quarto:** open the [SQL deck](sql-basics.html) and move a few widgets
+2. **marimo:** open [`sql-basics-marimo.py` on molab](https://molab.marimo.io/github/{{< meta repo-path >}}/sql-basics-marimo.py) (or [in your browser]({{< meta pages-url >}})), then
+    - click a row in the *Interactive tables* section and watch the drill-down update
+    - add a SQL cell that queries `where_df`
+    - delete a cell and see what happens to the cells that used it
+3. **Jupyter:** open [`sql-basics-jupyter.ipynb` in Colab](https://colab.research.google.com/github/{{< meta repo-path >}}/sql-basics-jupyter.ipynb) and do the **hidden state** exercise in Part 1
+
+::: muted
+Running locally? `uvx marimo edit --sandbox sql-basics-marimo.py` builds the environment from the file header
+:::
+
+## Resources
+
+<!-- Add your resources here -->
+
+- [marimo](https://marimo.io/gallery) · [docs](https://docs.marimo.io) · [molab](https://molab.marimo.io)
+- [Quarto](https://quarto.org/) · [quarto-marimo](https://github.com/marimo-team/quarto-marimo)
+- [Jupyter](https://jupyter.org/) · [ipywidgets](https://ipywidgets.readthedocs.io/)
+- [DuckDB](https://duckdb.org/) · [OMOP CDM](https://ohdsi.github.io/CommonDataModel/)
+- Pimentel, J. F., Murta, L., Braganholo, V., & Freire, J. (2019). *A Large-Scale Study About Quality and Reproducibility of Jupyter Notebooks.* MSR 2019

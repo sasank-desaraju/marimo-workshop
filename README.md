@@ -23,7 +23,8 @@ charts, and SQL cells (`mo.sql`) against a synthetic OMOP CDM database in
 DuckDB. The same lesson is given as a Quarto slide deck, a marimo notebook,
 and a Jupyter notebook.
 
-- Materials: https://github.com/pc-piyush/F26_Marimo (in `PC/`)
+- Materials: [`PC/`](PC/), copied from Piyush Chaudhari's repo
+  https://github.com/pc-piyush/F26_Marimo (in `PC/`)
 - Slides: https://pc-piyush.github.io/F26_Marimo/PC/
 
 ## Part 2: Marimo on HiPerGator for scientific work (Sasank Desaraju)
@@ -39,14 +40,12 @@ notebook runs on any laptop.
 ## Repository layout
 
 ```
+PC/              Part 1: Marimo 101, local use, and SQL (Piyush Chaudhari)
 hpg/             Part 2: HiPerGator notebooks, scripts, and setup (see hpg/README.md)
 README.md        this overview
 CITATION.cff     citation metadata for the whole workshop
 LICENSE          MIT
 ```
-
-Part 1 materials are in Piyush Chaudhari's repo,
-https://github.com/pc-piyush/F26_Marimo (in `PC/`), for now.
 
 ## How to cite
 
