@@ -1,0 +1,29 @@
+# Secrets
+.env
+
+# Run outputs and the arrays written by hpg/notebooks/01_preprocess.py
+runs/
+**/data/processed/
+**/logs/*
+!**/logs/.gitkeep
+slurm-*.out
+
+# Python and tooling
+uv.lock
+__pycache__/
+*.py[cod]
+.venv/
+.ipynb_checkpoints/
+__marimo__/
+.ruff_cache/
+.pytest_cache/
+
+# OS / editor
+.DS_Store
+.vscode/
+
+# Packaged copies of this repo
+*.tar.gz
+
+# Demo exports (marimo export html / html-wasm)
+exports/

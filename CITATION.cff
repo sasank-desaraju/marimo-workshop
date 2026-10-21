@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: >-
+  If you use these materials, please cite them as below.
+  The first two authors contributed equally.
+type: software
+title: "Marimo at UF: reactive notebooks from the laptop to HiPerGator (workshop materials)"
+abstract: >-
+  Materials for a two-part workshop on marimo reactive Python notebooks,
+  run with UF Research Computing on October 22, 2026. Part 1 covers marimo
+  basics, local use, and SQL cells. Part 2 covers using marimo for
+  scientific work on the HiPerGator supercomputer.
+authors:
+  - given-names: Sasank
+    family-names: Desaraju
+    affiliation: University of Florida
+  # TODO: Piyush's ORCID and affiliation (full name from github.com/pc-piyush)
+  - given-names: Piyush
+    family-names: Chaudhari
+repository-code: "https://github.com/sasank-desaraju/marimo-workshop"
+license: MIT
+version: 1.0.0
+date-released: 2026-10-22
+keywords:
+  - marimo
+  - HiPerGator
+  - reactive notebooks
+  - research computing

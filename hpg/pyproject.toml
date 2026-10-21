@@ -1,0 +1,38 @@
+# Each notebook carries its own dependencies (PEP 723 headers), so this file is
+# mostly here for marimo's project settings. The [project] table lets
+# `uv run marimo edit notebooks/` work with one shared environment, too.
+
+[project]
+name = "marimo-workshop"
+version = "0.1.0"
+description = "Marimo on HiPerGator: workshop materials"
+requires-python = ">=3.10"
+dependencies = [
+    "altair",
+    "marimo",
+    "matplotlib",
+    "mnist1d",
+    "numpy",
+    "openai",   # marimo's AI chat panel talks to NaviGator through this
+    "pandas",
+    "pytest",
+    "torch",
+]
+
+# marimo loads ./.env (next to this file) into the notebook environment, and
+# `env:` below reads the API key from there, so no key is ever committed.
+[tool.marimo.ai.custom_providers.navigator]
+api_key = "env:NAVIGATOR_API_KEY"
+base_url = "https://api.ai.it.ufl.edu/v1"  # TODO(HPG): confirm NaviGator endpoint
+
+[tool.marimo.ai.models]
+# TODO(HPG): pick a model your NaviGator key can use; keep the "navigator/" prefix.
+chat_model = "navigator/TODO-model-name"
+custom_models = ["navigator/TODO-model-name"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint.per-file-ignores]
+# marimo cells end in a bare expression (the output) and an explicit return.
+"notebooks/*.py" = ["B018", "PLR1711"]
