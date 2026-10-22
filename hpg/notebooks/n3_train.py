@@ -31,9 +31,11 @@ from pathlib import Path
 import torch
 from torch.utils.data import DataLoader
 
-from n2_dataset import MNIST1D, PROCESSED_PATH  # the n2_dataset.py notebook
+# Isn't this cool?!
+from n2_dataset import MNIST1D  # the n2_dataset.py notebook
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+PROCESSED_PATH = REPO_ROOT / "data" / "processed" / "mnist1d.npz"  # written by n1
 METRIC_FIELDS = ["epoch", "train_loss", "test_loss", "test_acc", "seconds"]
 
 
@@ -103,10 +105,10 @@ def parse_args():
 
 def main():
     args = parse_args()
-    data_path = args.data if args.data is not None else PROCESSED_PATH
     device = pick_device()
     torch.manual_seed(args.seed)
 
+    data_path = args.data if args.data is not None else PROCESSED_PATH
     train_loader = DataLoader(
         MNIST1D("train", data_path), batch_size=args.batch_size, shuffle=True
     )

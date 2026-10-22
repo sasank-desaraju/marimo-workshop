@@ -1,7 +1,7 @@
 # Secrets
 .env
 
-# Run outputs and the arrays written by hpg/notebooks/01_preprocess.py
+# Run outputs and the arrays written by hpg/notebooks/n1_preprocess.py
 runs/
 **/data/processed/
 **/logs/*

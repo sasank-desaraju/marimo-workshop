@@ -23,12 +23,11 @@ dependencies = [
 # `env:` below reads the API key from there, so no key is ever committed.
 [tool.marimo.ai.custom_providers.navigator]
 api_key = "env:NAVIGATOR_API_KEY"
-base_url = "https://api.ai.it.ufl.edu/v1"  # TODO(HPG): confirm NaviGator endpoint
+base_url = "https://api.ai.it.ufl.edu/v1"
 
 [tool.marimo.ai.models]
-# TODO(HPG): pick a model your NaviGator key can use; keep the "navigator/" prefix.
-chat_model = "navigator/TODO-model-name"
-custom_models = ["navigator/TODO-model-name"]
+chat_model = "navigator/gemma-4-31b-it"
+custom_models = ["navigator/gemma-4-31b-it"]
 
 [tool.ruff]
 line-length = 100
