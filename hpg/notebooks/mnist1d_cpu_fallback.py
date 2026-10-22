@@ -28,16 +28,13 @@ def _(mo):
     mo.md(r"""
     # Fallback demo: train a tiny model on CPU
 
-    The backup plan for the HiPerGator demo, in one self-contained file: no
-    GPU, no cluster, no other files from this repo, and no internet once the
-    packages are installed. The dataset is
-    [MNIST-1D](https://github.com/greydanus/mnist1d), generated on the fly
-    from a few templates, so there is nothing to download.
+    The backup plan for the HiPerGator demo in case HPG is inaccessible.
+    The dataset is
+    [MNIST-1D](https://github.com/greydanus/mnist1d).
 
-    Training takes well under a minute on a laptop CPU. If a GPU is
-    available, the same code uses it automatically.
+    Training takes well under a minute on a laptop CPU.
 
-    Run it anywhere:
+    Run it with:
 
     - `uvx marimo edit --sandbox mnist1d_cpu_fallback.py`
     - `uv run mnist1d_cpu_fallback.py --epochs 20` (plain script)
@@ -251,6 +248,20 @@ def _(alt, history, mo, pd):
             ),
             _chart,
         ]
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.hstack(
+        [
+            mo.md("Made by **Sasank Desaraju**. Scan for my links."),
+            mo.image(src=mo.notebook_dir().parent / "assets" / "linktree_qr.png", width=120),
+        ],
+        justify="start",
+        align="center",
+        gap=1,
     )
     return
 

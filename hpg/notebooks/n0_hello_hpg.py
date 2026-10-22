@@ -36,9 +36,10 @@ def _(mo):
     mo.md(r"""
     # Hello, HiPerGator! 🐊
 
-    A marimo notebook is a plain Python file where cells form a **dataflow
-    graph**: when you change something, every cell that depends on it re-runs,
-    and nothing else does. There is no hidden state and no "run all" to forget.
+    A marimo notebook is a plain Python file where every cell knows what other cells it's dependent on.
+    This lets each cell re-run whenever it needs to.
+    There's not "hidden state" where you can lose track of what variable has what value.
+    It's also great for interactivity and visualization!
 
     Drag the sliders below and watch the plot follow.
     """)
@@ -55,7 +56,7 @@ def _(mo):
 
 @app.cell
 def _(alt, damping, frequency, np, pd):
-    # This cell reads `frequency.value` and `damping.value`, so marimo re-runs it
+    # This cell reads from `frequency` and `damping` which are in the cell above, so marimo re-runs it
     # whenever either slider moves.
     t = np.linspace(0, 10, 500)
     wave = np.exp(-damping.value * t) * np.sin(2 * np.pi * frequency.value * t)
@@ -128,6 +129,20 @@ def _(allocated_cpus, mo, os, platform, socket, sys):
         )
     )
     mo.hstack([_host, _jobs], widths="equal", gap=2, align="start")
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.hstack(
+        [
+            mo.md("Made by **Sasank Desaraju**."),
+            mo.image(src=mo.notebook_dir().parent / "assets" / "linktree_qr.png", width=120),
+        ],
+        justify="start",
+        align="center",
+        gap=1,
+    )
     return
 
 

@@ -12,7 +12,7 @@
 
 import marimo
 
-__generated_with = "0.25.2"
+__generated_with = "0.25.1"
 app = marimo.App(width="medium")
 
 with app.setup:
@@ -33,7 +33,7 @@ class MNIST1D(Dataset):
     """One split of processed MNIST-1D.
 
     Each item is `(x, y)`: `x` is float32 with shape `[length]`, `y` an int64
-    label. `path` defaults to the `.npz` written by `01_preprocess.py`.
+    label. `path` defaults to the `.npz` written by `n1_preprocess.py`.
     """
 
     def __init__(self, split: str = "train", path: str | Path | None = None):
@@ -43,7 +43,7 @@ class MNIST1D(Dataset):
         self.path = Path(path) if path is not None else PROCESSED_PATH
         if not self.path.is_file():
             raise FileNotFoundError(
-                f"No processed data at {self.path}. Run notebooks/01_preprocess.py first."
+                f"No processed data at {self.path}. Run notebooks/n1_preprocess.py first."
             )
         meta_path = self.path.with_name("metadata.json")
         self.meta = json.loads(meta_path.read_text()) if meta_path.is_file() else {}
@@ -85,13 +85,13 @@ def _(mo):
     # Check the processed MNIST-1D set
 
     `MNIST1D` above is a normal PyTorch `Dataset`, exported from this notebook
-    (`@app.class_definition`) so `03_train.py` can import it. It reads
+    (`@app.class_definition`) so `n3_train.py` can import it. It reads
     `data/processed/mnist1d.npz`. The plots below are a visual check that the
     examples and the preprocessing actually landed. The `test_*` functions at
     the bottom run with pytest:
 
     ```bash
-    pytest notebooks/02_dataset.py
+    pytest notebooks/n2_dataset.py
     ```
 
     The charts are Altair: you map DataFrame columns to `x`, `y`, and `color`,
@@ -114,7 +114,7 @@ def _(mo, split):
         mo.stop(
             True,
             mo.callout(
-                mo.md("No `data/processed/mnist1d.npz` yet. Run `01_preprocess.py` first."),
+                mo.md("No `data/processed/mnist1d.npz` yet. Run `n1_preprocess.py` first."),
                 kind="warn",
             ),
         )
@@ -247,7 +247,7 @@ def _(mo):
 
 @app.function
 def test_sequence_length():
-    # Break live: change 40 to 41, save, rerun `pytest notebooks/02_dataset.py`.
+    # Break live: change 40 to 41, save, rerun `pytest notebooks/n2_dataset.py`.
     x, _y = MNIST1D("train")[0]
     assert x.shape == (40,)
 
@@ -297,6 +297,20 @@ def test_transform_changes_values():
 
         pytest.skip("pipeline was asked to make no changes")
     assert not torch.allclose(data.x, data.x_raw)
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.hstack(
+        [
+            mo.md("Made by **Sasank Desaraju**."),
+            mo.image(src=mo.notebook_dir().parent / "assets" / "linktree_qr.png", width=120),
+        ],
+        justify="start",
+        align="center",
+        gap=1,
+    )
+    return
 
 
 if __name__ == "__main__":

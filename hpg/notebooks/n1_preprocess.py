@@ -38,10 +38,10 @@ def _():
     and a batch step:
 
     ```bash
-    uv run notebooks/01_preprocess.py --out data/processed --normalize zscore --filter smooth
+    uv run notebooks/n1_preprocess.py --out data/processed --normalize zscore --filter smooth
     ```
 
-    `02_dataset.py` reads `data/processed/mnist1d.npz` and `metadata.json`.
+    `n2_dataset.py` reads `data/processed/mnist1d.npz` and `metadata.json`.
     """)
     return
 
@@ -237,6 +237,20 @@ def _(arrays, augment, filter_kind, fit, normalize, out_dir, save, seed):
     except ValueError:
         shown = npz_path
     mo.callout(mo.md(f"Wrote `{shown}` and `{meta_path.name}`."), kind="success")
+    return
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.hstack(
+        [
+            mo.md("Made by **Sasank Desaraju**."),
+            mo.image(src=mo.notebook_dir().parent / "assets" / "linktree_qr.png", width=120),
+        ],
+        justify="start",
+        align="center",
+        gap=1,
+    )
     return
 
 

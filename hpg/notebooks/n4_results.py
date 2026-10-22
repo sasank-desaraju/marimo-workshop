@@ -9,7 +9,7 @@
 
 import marimo
 
-__generated_with = "0.25.2"
+__generated_with = "0.25.1"
 app = marimo.App(width="medium")
 
 with app.setup:
@@ -30,7 +30,7 @@ def _():
     # Training runs
 
     Reads `runs/<timestamp>-<jobid>/` straight off disk: `metrics.csv` (one
-    row per epoch), `params.json`, and `model.pt` from `03_train.py`.
+    row per epoch), `params.json`, and `model.pt` from `n3_train.py`.
     Turn on auto-refresh to watch a Slurm job fill in.
     """)
     return
@@ -71,7 +71,7 @@ def _(refresh):
         mo.callout(
             mo.md(
                 f"No epoch rows in `{RUNS_DIR}` yet. "
-                "Run `notebooks/03_train.py` or `sbatch scripts/train.sbatch`, "
+                "Run `notebooks/n3_train.py` or `sbatch scripts/train.sbatch`, "
                 "then turn on auto-refresh."
             ),
             kind="warn",
@@ -83,7 +83,7 @@ def _(refresh):
 
 
 @app.cell
-def _(history, mo, params_df):
+def _(history, params_df):
     _last = (
         history.sort_values("epoch")
         .groupby("run", as_index=False)
@@ -122,7 +122,7 @@ def _(history, mo, params_df):
 
 
 @app.cell
-def _(mo):
+def _():
     metric = mo.ui.dropdown(
         {"Test accuracy": "test_acc", "Train loss": "train_loss", "Test loss": "test_loss"},
         value="Test accuracy",
@@ -133,7 +133,7 @@ def _(mo):
 
 
 @app.cell
-def _(history, metric, mo, runs_table):
+def _(history, metric, runs_table):
     _selected = runs_table.value
     if isinstance(_selected, pd.DataFrame) and not _selected.empty:
         _plotted = history[history["run"].isin(_selected["run"])]
@@ -151,6 +151,20 @@ def _(history, metric, mo, runs_table):
         .properties(height=300, width=680)
     )
     mo.ui.altair_chart(_chart)
+    return
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.hstack(
+        [
+            mo.md("Made by **Sasank Desaraju**."),
+            mo.image(src=mo.notebook_dir().parent / "assets" / "linktree_qr.png", width=120),
+        ],
+        justify="start",
+        align="center",
+        gap=1,
+    )
     return
 
 

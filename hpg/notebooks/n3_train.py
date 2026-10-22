@@ -3,7 +3,7 @@
 # dependencies = [
 #     "marimo",
 #     "numpy",
-#     "pytest",  # importing 02_dataset.py compiles its tests
+#     "pytest",  # importing n2_dataset.py compiles its tests
 #     "torch",
 # ]
 # ///
@@ -11,11 +11,9 @@
 """Train a small 1D CNN on processed MNIST-1D.
 
 Writes `runs/<timestamp>-<jobid or local>/{params.json,metrics.csv,model.pt}`.
-The dataset class lives in `02_dataset.py`. That name is not a legal import
-(`import 02_dataset` is a syntax error), so this script loads the file by
-path. `@app.class_definition` still binds `MNIST1D` as a normal class.
+The dataset class is imported from the n2_dataset.py notebook next to this file.
 
-  uv run notebooks/03_train.py --epochs 2
+  uv run notebooks/n3_train.py --epochs 2
   sbatch scripts/train.sbatch --epochs 5
 """
 
@@ -23,7 +21,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-import importlib.util
 import json
 import os
 import sys
@@ -34,20 +31,10 @@ from pathlib import Path
 import torch
 from torch.utils.data import DataLoader
 
+from n2_dataset import MNIST1D, PROCESSED_PATH  # the n2_dataset.py notebook
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 METRIC_FIELDS = ["epoch", "train_loss", "test_loss", "test_acc", "seconds"]
-
-
-def load_dataset_module():
-    """Load `02_dataset.py` and return the module (see the module docstring)."""
-    path = Path(__file__).with_name("02_dataset.py")
-    spec = importlib.util.spec_from_file_location("workshop_dataset", path)
-    if spec is None or spec.loader is None:
-        raise ImportError(f"cannot load {path}")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
-    return module
 
 
 def pick_device() -> torch.device:
@@ -109,22 +96,21 @@ def parse_args():
         "--data",
         type=Path,
         default=None,
-        help="Processed .npz (default: data/processed/mnist1d.npz from 02_dataset.py).",
+        help="Processed .npz (default: data/processed/mnist1d.npz from n2_dataset.py).",
     )
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
-    dataset = load_dataset_module()
-    data_path = args.data if args.data is not None else dataset.PROCESSED_PATH
+    data_path = args.data if args.data is not None else PROCESSED_PATH
     device = pick_device()
     torch.manual_seed(args.seed)
 
     train_loader = DataLoader(
-        dataset.MNIST1D("train", data_path), batch_size=args.batch_size, shuffle=True
+        MNIST1D("train", data_path), batch_size=args.batch_size, shuffle=True
     )
-    test_loader = DataLoader(dataset.MNIST1D("test", data_path), batch_size=1000)
+    test_loader = DataLoader(MNIST1D("test", data_path), batch_size=1000)
 
     meta_path = data_path.with_name("metadata.json")
     normalize = None
@@ -154,7 +140,7 @@ def main():
     with (run_dir / "metrics.csv").open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=METRIC_FIELDS)
         writer.writeheader()
-        handle.flush()  # 04_results.py can see the file before the first epoch lands
+        handle.flush()  # n4_results.py can see the file before the first epoch lands
         for epoch in range(1, args.epochs + 1):
             train_loss, _train_acc = run_epoch(model, train_loader, device, opt)
             test_loss, test_acc = run_epoch(model, test_loader, device)
