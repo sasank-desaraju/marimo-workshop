@@ -34,7 +34,7 @@ the launcher's "Edit with marimo".
 ```bash
 # On HPG. TODO(HPG): recommended location (e.g. /blue/<group>/$USER vs home).
 cd /blue/TODO_GROUP/$USER
-git clone TODO_REPO_URL marimo-workshop
+git clone https://github.com/sasank-desaraju/marimo-workshop.git
 cd marimo-workshop/hpg
 cp .env.example .env              # then paste your NaviGator key into .env
 

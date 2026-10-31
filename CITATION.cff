@@ -13,7 +13,6 @@ authors:
   - given-names: Sasank
     family-names: Desaraju
     affiliation: University of Florida
-  # TODO: Piyush's ORCID and affiliation (full name from github.com/pc-piyush)
   - given-names: Piyush
     family-names: Chaudhari
 repository-code: "https://github.com/sasank-desaraju/marimo-workshop"
